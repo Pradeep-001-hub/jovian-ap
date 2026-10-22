@@ -1,16 +1,16 @@
 cff-version: 1.2.0
-message: "If you use or reference this project, please cite it as a research prototype."
+message: "Please cite this project when using or referencing its methods, software, or results."
 title: "JOVIAN-AP: Data Assimilation with an OpenFOAM-Based Rotating-Flow Model of Jovian Jets and Vortices"
 type: software
 authors:
-  - family-names: "Pradeep"
-    given-names: "Koramutla"
-version: 0.1.0
-date-released: 2026-10-22
+  - family-names: "Koramutla"
+    given-names: "Pradeep"
 abstract: >
-  JOVIAN-AP is an early-stage research prototype investigating data
-  assimilation for a rotating-flow model inspired by Jovian atmospheric
-  jets and vortices. The planned workflow compares model forecasts with
-  synthetic observations and evaluates whether data assimilation improves
-  reconstruction and prediction. Model implementation, verification,
-  and quantitative results remain subject to development and testing.
+  JOVIAN-AP aims to develop a computational framework for studying
+  rotating atmospheric flows inspired by Jupiter's jets and vortices.
+  The project investigates the use of numerical fluid dynamics,
+  synthetic observations, and data assimilation to improve the
+  reconstruction and prediction of atmospheric flow fields. Its
+  objectives include implementing and verifying a suitable physical
+  model, evaluating data assimilation methods, conducting reproducible
+  numerical experiments, and quantitatively assessing forecast accuracy.
