@@ -1,1 +1,72 @@
+Python cache and temporary files
 
+pycache/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+Python virtual environments
+
+.venv/
+venv/
+env/
+
+Jupyter Notebook temporary files
+
+.ipynb_checkpoints/
+
+Operating system files
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+Editor and IDE files
+
+.vscode/
+.idea/
+
+OpenFOAM generated simulation output
+
+processor*/
+postProcessing/
+dynamicCode/
+log.*
+*.foam
+
+OpenFOAM time directories
+
+Keep the initial conditions in the 0/ directory.
+
+Ignore numeric simulation time directories only.
+
+[1-9]/
+0.[0-9]/
+
+Generated plots and temporary results
+
+results/generated/
+results/tmp/
+*.tmp
+
+Local environment and machine-specific configuration
+
+.env
+.env.*
+!.env.example
+
+Build artefacts
+
+build/
+dist/
+compile_commands.json
+*.o
+*.so
+*.a
+
+Local experiment outputs
+
+experiments/output/
