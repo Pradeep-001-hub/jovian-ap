@@ -1,0 +1,133 @@
+# JOVIAN-AP Model Configuration
+#
+# This is a configuration template, not a runnable simulation.
+# Numerical values must be selected and verified before use.
+# All dimensional quantities use SI units unless stated otherwise.
+
+project:
+  name: "JOVIAN-AP"
+  model: "rotating_shallow_water_beta_plane"
+  configuration_version: 1
+
+# --------------------------------------------------
+# 1. Physical model
+# --------------------------------------------------
+
+model:
+  equations: "rotating_shallow_water"
+  coordinate_system: "local_cartesian"
+  x_direction: "eastward"
+  y_direction: "northward"
+  vertical_direction: "upward"
+
+  bottom_topography: "flat"
+  reference_depth_constant: true
+
+  include_explicit_friction: false
+  include_external_forcing: false
+
+# --------------------------------------------------
+# 2. Planetary parameters
+# --------------------------------------------------
+
+planet:
+  name: "Jupiter"
+
+  # Obtain values from documented scientific sources.
+  # Do not substitute arbitrary values.
+
+  rotation_rate_rad_per_s: null
+  radius_m: null
+  reference_latitude_deg: null
+
+# --------------------------------------------------
+# 3. Beta-plane parameters
+# --------------------------------------------------
+
+beta_plane:
+  enabled: true
+
+  # f(y) = f0 + beta*y
+  #
+  # f0 = 2 * Omega * sin(phi0)
+  # beta = 2 * Omega * cos(phi0) / a
+  #
+  # Calculate these consistently from the selected
+  # planetary parameters and reference latitude.
+
+  coriolis_parameter_f0_per_s: null
+  coriolis_gradient_beta_per_m_s: null
+
+  parameter_status: "not_yet_calculated"
+
+# --------------------------------------------------
+# 4. Shallow-water parameters
+# --------------------------------------------------
+
+shallow_water:
+  reference_depth_m: null
+  gravity_m_per_s2: null
+
+  minimum_allowed_layer_thickness_m: null
+
+  parameter_status: "requires_physical_justification"
+
+# --------------------------------------------------
+# 5. Computational domain
+# --------------------------------------------------
+
+domain:
+  length_x_m: null
+  length_y_m: null
+
+  boundary_conditions:
+    west: "undecided"
+    east: "undecided"
+    south: "undecided"
+    north: "undecided"
+
+  parameter_status: "not_yet_defined"
+
+# --------------------------------------------------
+# 6. Numerical configuration
+# --------------------------------------------------
+
+numerics:
+  spatial_discretisation: "undecided"
+  time_integration: "undecided"
+
+  initial_time_s: 0.0
+  final_time_s: null
+  time_step_s: null
+
+  mesh:
+    cells_x: null
+    cells_y: null
+
+  parameter_status: "requires_solver_selection"
+
+# --------------------------------------------------
+# 7. Reproducibility
+# --------------------------------------------------
+
+reproducibility:
+  random_seed: 2026
+
+  record_model_parameters: true
+  record_solver_version: true
+  record_numerical_settings: true
+
+# --------------------------------------------------
+# 8. Configuration status
+# --------------------------------------------------
+
+status:
+  ready_for_simulation: false
+
+  pending:
+    - "Verify the governing equations and numerical formulation"
+    - "Select and document planetary parameters"
+    - "Justify shallow-water parameters"
+    - "Define the domain and boundary conditions"
+    - "Select mesh resolution and time integration"
+    - "Establish numerical stability requirements"
