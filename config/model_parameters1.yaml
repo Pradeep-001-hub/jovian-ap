@@ -1,0 +1,128 @@
+# JOVIAN-AP: Model Parameters
+# Status: Initial configuration; values require verification.
+# This file defines proposed settings, not a validated simulation.
+
+project:
+  name: "JOVIAN-AP"
+  model_status: "under_development"
+
+model:
+  type: "rotating_shallow_water_beta_plane"
+  dimensions: 2
+  description: >
+    Idealised rotating shallow-water model inspired by
+    Jovian atmospheric jets and vortices.
+
+physical_parameters:
+  # Jupiter-inspired reference values.
+  # Verify sources and units before scientific use.
+  rotation_rate:
+    value: 0.00017585
+    unit: "rad/s"
+
+  planetary_radius:
+    value: 69911000.0
+    unit: "m"
+
+  reference_latitude:
+    value: 45.0
+    unit: "degrees"
+
+  # Derived parameters must be calculated and checked.
+  coriolis_parameter:
+    symbol: "f0"
+    value: null
+    unit: "1/s"
+    status: "to_be_calculated"
+
+  beta_parameter:
+    symbol: "beta"
+    value: null
+    unit: "1/(m*s)"
+    status: "to_be_calculated"
+
+  gravity:
+    value: null
+    unit: "m/s^2"
+    status: "to_be_selected_and_justified"
+
+  mean_layer_thickness:
+    value: null
+    unit: "m"
+    status: "to_be_selected_and_justified"
+
+computational_domain:
+  length_x:
+    value: null
+    unit: "m"
+
+  length_y:
+    value: null
+    unit: "m"
+
+  cells_x:
+    value: null
+
+  cells_y:
+    value: null
+
+  status: "awaiting_numerical_design"
+
+time_integration:
+  start_time:
+    value: 0.0
+    unit: "s"
+
+  end_time:
+    value: null
+    unit: "s"
+
+  time_step:
+    value: null
+    unit: "s"
+    status: "to_be_determined_from_stability_analysis"
+
+initial_conditions:
+  velocity_x:
+    description: "Initial horizontal velocity field u(x,y)"
+    status: "to_be_defined"
+
+  velocity_y:
+    description: "Initial horizontal velocity field v(x,y)"
+    status: "to_be_defined"
+
+  layer_thickness:
+    description: "Initial fluid-layer thickness h(x,y)"
+    status: "to_be_defined"
+
+observations:
+  source: "synthetic"
+  generation_method: "to_be_implemented"
+  observation_noise: "to_be_defined"
+  sampling_locations: "to_be_defined"
+  sampling_interval: "to_be_defined"
+
+data_assimilation:
+  baseline:
+    name: "free_run"
+    enabled: true
+
+  methods:
+    - "nudging"
+    - "optimal_interpolation"
+    - "ensemble_kalman_filter"
+
+  implementation_status: "planned_not_implemented"
+
+verification:
+  mass_conservation: true
+  grid_convergence: true
+  time_step_sensitivity: true
+  reference_solution_comparison: true
+  positivity_of_layer_thickness: true
+
+reproducibility:
+  random_seed: 42
+  record_configuration: true
+  record_solver_version: true
+  record_git_commit: true
