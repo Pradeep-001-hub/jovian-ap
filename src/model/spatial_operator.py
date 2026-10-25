@@ -1,130 +1,116 @@
-"""
-JOVIAN-AP: Finite-volume spatial operator.
-
-Calculates the spatial flux divergence and Coriolis source term
-for a two-dimensional rotating shallow-water state.
-
-State shape:
-    (ny, nx, 3)
-
-Final state dimension:
-    [h, hu, hv]
-
-Boundary conditions:
-    Periodic in x and y.
-
-Important:
-    Periodic boundaries are a numerical starting point. A periodic
-    y-domain is not generally compatible with a non-periodic beta-plane
-    Coriolis parameter. Use constant Coriolis parameter for periodic-y
-    tests until suitable physical boundary conditions are implemented.
-
-This module calculates dU/dt; it does not perform time integration.
-"""
-
 import numpy as np
+import pytest
 
-from src.model.finite_volume import (
-    coriolis_source,
+from src.model.spatial_operator import spatial_operator
+
+def test_uniform_resting_state_has_zero_tendency():
+"""A uniform fluid at rest should have no spatial tendency."""
+ny, nx = 4, 5
+gravity = 9.81
+h0 = 100.0
+
+state = np.zeros((ny, nx, 3), dtype=float)
+state[..., 0] = h0
+
+tendency = spatial_operator(
+    state=state,
+    dx=1000.0,
+    dy=1000.0,
+    gravity=gravity,
+    coriolis=1.0e-4,
 )
-from src.model.numerical_flux import (
-    rusanov_flux_x,
-    rusanov_flux_y,
+
+assert tendency.shape == state.shape
+np.testing.assert_allclose(tendency, 0.0, atol=1.0e-12)
+
+def test_spatial_operator_preserves_state_shape():
+"""The output must have the same shape as the input state."""
+state = np.zeros((3, 4, 3), dtype=float)
+state[..., 0] = 50.0
+
+tendency = spatial_operator(
+    state,
+    dx=1000.0,
+    dy=2000.0,
+    gravity=9.81,
+    coriolis=0.0,
 )
 
+assert tendency.shape == state.shape
 
-def spatial_operator(state, dx, dy, gravity, coriolis):
-    """
-    Calculate the finite-volume rate of change of the conservative state.
+def test_periodic_fluxes_conserve_total_thickness():
+"""Periodic flux differences should conserve total thickness."""
+rng = np.random.default_rng(42)
+ny, nx = 5, 6
 
-    Parameters
-    ----------
-    state : array-like, shape (ny, nx, 3)
-        Conservative state [h, hu, hv].
-    dx, dy : float
-        Positive, uniform grid spacing.
-    gravity : float
-        Positive gravitational acceleration.
-    coriolis : scalar or array-like, shape (ny, nx)
-        Coriolis parameter, broadcastable to the grid shape.
+state = np.zeros((ny, nx, 3), dtype=float)
+state[..., 0] = rng.uniform(10.0, 100.0, size=(ny, nx))
+state[..., 1] = rng.normal(0.0, 2.0, size=(ny, nx))
+state[..., 2] = rng.normal(0.0, 2.0, size=(ny, nx))
 
-    Returns
-    -------
-    numpy.ndarray, shape (ny, nx, 3)
-        Time derivative dU/dt.
+tendency = spatial_operator(
+    state,
+    dx=1000.0,
+    dy=1000.0,
+    gravity=9.81,
+    coriolis=0.0,
+)
 
-    Notes
-    -----
-    Periodic boundaries are used in both directions. Numerical interface
-    fluxes are computed once per periodic interface and reused by the
-    neighbouring cells through the flux-difference operation.
-    """
+total_thickness_tendency = np.sum(tendency[..., 0])
 
-    try:
-        state = np.asarray(state, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("State must contain numeric values.") from exc
+assert abs(total_thickness_tendency) < 1.0e-10
 
-    if state.ndim != 3 or state.shape[-1] != 3:
-        raise ValueError(
-            "State must have shape (ny, nx, 3), with final dimension [h, hu, hv]."
-        )
+@pytest.mark.parametrize("dx", [0.0, -1.0, np.inf, np.nan, True])
+def test_invalid_dx_is_rejected(dx):
+state = np.zeros((2, 2, 3), dtype=float)
+state[..., 0] = 10.0
 
-    ny, nx, _ = state.shape
+with pytest.raises(ValueError):
+    spatial_operator(
+        state,
+        dx=dx,
+        dy=1.0,
+        gravity=9.81,
+        coriolis=0.0,
+    )
 
-    if nx < 2 or ny < 2:
-        raise ValueError("Grid must contain at least two cells per direction.")
+@pytest.mark.parametrize("dy", [0.0, -1.0, np.inf, np.nan, True])
+def test_invalid_dy_is_rejected(dy):
+state = np.zeros((2, 2, 3), dtype=float)
+state[..., 0] = 10.0
 
-    if not np.all(np.isfinite(state)):
-        raise ValueError("State must contain only finite values.")
+with pytest.raises(ValueError):
+    spatial_operator(
+        state,
+        dx=1.0,
+        dy=dy,
+        gravity=9.81,
+        coriolis=0.0,
+    )
 
-    if np.any(state[..., 0] <= 0.0):
-        raise ValueError("Layer thickness must be strictly positive.")
+def test_nonpositive_thickness_is_rejected():
+state = np.zeros((2, 2, 3), dtype=float)
+state[..., 0] = 10.0
+state[0, 0, 0] = 0.0
 
-    for name, spacing in (("dx", dx), ("dy", dy)):
-        if isinstance(spacing, (bool, np.bool_)):
-            raise ValueError(f"{name} must be a finite positive number.")
+with pytest.raises(ValueError, match="positive"):
+    spatial_operator(
+        state,
+        dx=1.0,
+        dy=1.0,
+        gravity=9.81,
+        coriolis=0.0,
+    )
 
-        try:
-            spacing = float(spacing)
-        except (TypeError, ValueError, OverflowError) as exc:
-            raise ValueError(
-                f"{name} must be a finite positive number."
-            ) from exc
+def test_invalid_coriolis_shape_is_rejected():
+state = np.zeros((3, 4, 3), dtype=float)
+state[..., 0] = 10.0
 
-        if not np.isfinite(spacing) or spacing <= 0.0:
-            raise ValueError(f"{name} must be a finite positive number.")
-
-        if name == "dx":
-            dx = spacing
-        else:
-            dy = spacing
-
-    try:
-        gravity = float(gravity)
-    except (TypeError, ValueError, OverflowError) as exc:
-        raise ValueError("Gravity must be a finite positive number.") from exc
-
-    if not np.isfinite(gravity) or gravity <= 0.0:
-        raise ValueError("Gravity must be a finite positive number.")
-
-    # Right and left states at each x-normal interface.
-    state_right = np.roll(state, -1, axis=1)
-    flux_x = rusanov_flux_x(state, state_right, gravity)
-
-    # Upper and lower states at each y-normal interface.
-    state_upper = np.roll(state, -1, axis=0)
-    flux_y = rusanov_flux_y(state, state_upper, gravity)
-
-    # Periodic flux divergence.
-    divergence_x = (
-        flux_x - np.roll(flux_x, 1, axis=1)
-    ) / dx
-
-    divergence_y = (
-        flux_y - np.roll(flux_y, 1, axis=0)
-    ) / dy
-
-    source = coriolis_source(state, coriolis)
-
-    return -divergence_x - divergence_y + source
+with pytest.raises(ValueError):
+    spatial_operator(
+        state,
+        dx=1.0,
+        dy=1.0,
+        gravity=9.81,
+        coriolis=np.zeros((2, 2)),
+    )
