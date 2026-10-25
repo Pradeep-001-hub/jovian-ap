@@ -17,38 +17,9 @@ cfl=None,
 """
 Advance a shallow-water state through a fixed number of time steps.
 
-Parameters
-----------
-initial_state : array_like
-    Conservative state with shape (ny, nx, 3), storing
-    [h, h*u, h*v].
-dt : float
-    Requested time step in seconds.
-num_steps : int
-    Number of time steps to perform.
-dx, dy : float
-    Grid spacings in the x and y directions.
-gravity : float
-    Positive gravity parameter.
-coriolis : float or array_like
-    Coriolis parameter used by the spatial operator.
-cfl : float or None, optional
-    If provided, check the requested time step against the
-    estimated CFL time-step limit before every step.
-    Must be positive and no greater than 1.
-    If None, no CFL check is performed.
-
-Returns
--------
-dict
-    Final state, elapsed time, step count, and thickness diagnostics.
-
-Notes
------
-The CFL estimate is a stability guideline, not a proof that the
-complete numerical scheme is stable or physically accurate.
+If cfl is provided, reject time steps that exceed the estimated
+CFL limit. The time step is never changed automatically.
 """
-
 state = np.array(initial_state, dtype=float, copy=True)
 
 if state.ndim != 3 or state.shape[-1] != 3:
@@ -134,7 +105,7 @@ return {
 }
 
 def _spatial_operator(state, *, dx, dy, gravity, coriolis):
-"""Adapter connecting the simulation to the spatial discretisation."""
+"""Connect the simulation loop to the spatial discretisation."""
 from src.model.spatial_operator import spatial_operator
 
 return spatial_operator(
