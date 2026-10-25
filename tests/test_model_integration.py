@@ -67,7 +67,7 @@ def test_complete_model_accepts_vortex_initial_condition():
     assert np.all(np.isfinite(final_state))
     assert np.all(final_state[..., 0] > 0.0)
     assert result["steps"] == 3
-    assert result["time"] == 3.0e-5
+    assert np.isclose(result["time"], 3.0e-5, rtol=1.0e-12)
 
 
 def test_complete_model_conserves_total_thickness():
