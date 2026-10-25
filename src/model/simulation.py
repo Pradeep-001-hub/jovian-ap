@@ -14,8 +14,8 @@ gravity,
 coriolis,
 cfl=None,
 ):
-"""
-Advance a shallow-water state through a fixed number of time steps.
+    """
+    Advance a shallow-water state through a fixed number of time steps.
 
 If cfl is provided, reject time steps that exceed the estimated
 CFL limit. The time step is never changed automatically.
