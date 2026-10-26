@@ -1,0 +1,20 @@
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      jovianProperties;
+}
+
+gravity             1.0;
+
+rotationRate        0.00017585;
+
+referenceLatitude   45.0;
+
+planetaryRadius     69911000.0;
+
+meanLayerThickness  10000.0;
+
+kinematicViscosity  0.0;
+
+linearDrag          0.0;
