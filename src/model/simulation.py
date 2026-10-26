@@ -31,8 +31,8 @@ def run_simulation(
     """
     Advance a shallow-water state through a fixed number of time steps.
 
-    If cfl is provided, reject time steps that exceed the estimated
-    CFL limit. The time step is never changed automatically.
+    If cfl is provided, reject time steps exceeding the estimated CFL
+    limit. The requested time step is never changed automatically.
     """
     state = np.array(initial_state, dtype=float, copy=True)
 
@@ -53,28 +53,20 @@ def run_simulation(
 
     if np.any(state[..., 0] <= 0.0):
         raise ValueError(
-            "Initial layer thickness must be positive."
+            "Initial layer thickness must be strictly positive."
         )
 
     if isinstance(num_steps, (bool, np.bool_)):
-        raise ValueError(
-            "num_steps must be a non-negative integer."
-        )
+        raise ValueError("Number of steps must be a non-negative integer.")
 
     if not isinstance(num_steps, (int, np.integer)) or num_steps < 0:
-        raise ValueError(
-            "num_steps must be a non-negative integer."
-        )
+        raise ValueError("Number of steps must be a non-negative integer.")
 
     if isinstance(dt, (bool, np.bool_)):
-        raise ValueError(
-            "dt must be finite and positive."
-        )
+        raise ValueError("Time step must be finite and positive.")
 
     if not np.isscalar(dt) or not np.isfinite(dt) or dt <= 0.0:
-        raise ValueError(
-            "dt must be finite and positive."
-        )
+        raise ValueError("Time step must be finite and positive.")
 
     if cfl is not None:
         if isinstance(cfl, (bool, np.bool_)):
@@ -124,6 +116,7 @@ def run_simulation(
         )
 
     final_thickness = float(np.sum(state[..., 0]))
+    thickness_change = final_thickness - initial_thickness
 
     return {
         "state": state,
@@ -131,9 +124,8 @@ def run_simulation(
         "steps": int(num_steps),
         "initial_total_thickness": initial_thickness,
         "final_total_thickness": final_thickness,
-        "total_thickness_change": (
-            final_thickness - initial_thickness
-        ),
+        "thickness_change": thickness_change,
+        "total_thickness_change": thickness_change,
         "minimum_thickness": float(np.min(state[..., 0])),
         "maximum_thickness": float(np.max(state[..., 0])),
     }
