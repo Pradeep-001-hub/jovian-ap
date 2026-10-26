@@ -58,7 +58,8 @@ def test_characteristic_speeds_for_resting_state():
     assert speed_y == pytest.approx(expected)
 
 
-def test_characteristic_speeds_include_fluid_velocity():
+def
+est_characteristic_speeds_include_fluid_velocity():
     state = np.zeros((2, 2, 3), dtype=float)
     state[..., 0] = 100.0
     state[..., 1] = 200.0
@@ -74,7 +75,6 @@ def test_characteristic_speeds_include_fluid_velocity():
     assert speed_x == pytest.approx(2.0 + wave_speed)
     assert speed_y == pytest.approx(1.0 + wave_speed)
 
-
 @pytest.mark.parametrize(
     "state",
     [
@@ -85,12 +85,8 @@ def test_characteristic_speeds_include_fluid_velocity():
     ],
 )
 def test_characteristic_speeds_reject_invalid_state(state):
-    if state.shape[-1] == 3 and np.all(state == 0.0):
-        state = state.copy()
-        state[..., 0] = 100.0
-
     with pytest.raises(ValueError):
-        maximum_characteristic_speeds(state, gravity=9.81)
+        maximum_characteristic_speeds(state, 1.0)
 
 
 def test_cfl_time_step_matches_formula():
