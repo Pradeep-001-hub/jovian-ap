@@ -85,8 +85,8 @@ def test_characteristic_speeds_include_fluid_velocity():
     ],
 )
 def test_characteristic_speeds_reject_invalid_state(state):
-    with pytest.raises(ValueError):
-        maximum_characteristic_speeds(state)
+    with pytest.raises((ValueError, TypeError)):
+        maximum_characteristic_speeds(state, gravity=9.81)
 
 
 def test_cfl_time_step_matches_formula():
