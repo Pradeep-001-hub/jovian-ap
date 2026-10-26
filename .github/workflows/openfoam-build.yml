@@ -1,0 +1,36 @@
+name: OpenFOAM Foundation v14 Build
+
+on:
+  push:
+    paths:
+      - "openfoam/solvers/**"
+      - ".github/workflows/openfoam-build.yml"
+  pull_request:
+    paths:
+      - "openfoam/solvers/**"
+      - ".github/workflows/openfoam-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile JOVIAN-AP Solver
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install OpenFOAM Foundation v14
+        uses: gerlero/setup-openfoam@v1
+        with:
+          openfoam-version: 14
+
+      - name: Display OpenFOAM version
+        run: foamVersion
+
+      - name: Compile jovianShallowWater
+        working-directory: openfoam/solvers/jovianShallowWater
+        run: wmake
