@@ -74,7 +74,6 @@ est_characteristic_speeds_include_fluid_velocity():
 
     assert speed_x == pytest.approx(2.0 + wave_speed)
     assert speed_y == pytest.approx(1.0 + wave_speed)
-
 @pytest.mark.parametrize(
     "state",
     [
@@ -86,7 +85,7 @@ est_characteristic_speeds_include_fluid_velocity():
 )
 def test_characteristic_speeds_reject_invalid_state(state):
     with pytest.raises(ValueError):
-        maximum_characteristic_speeds(state, 1.0)
+        maximum_characteristic_speeds(state)
 
 
 def test_cfl_time_step_matches_formula():
