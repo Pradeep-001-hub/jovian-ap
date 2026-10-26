@@ -35,6 +35,17 @@ jobs:
           test "$WM_PROJECT_VERSION" = "14"
           test -f "$WM_PROJECT_DIR/etc/bashrc"
 
+      - name: Inspect OpenFOAM finite-volume headers
+        run: |
+          echo "OpenFOAM root: $WM_PROJECT_DIR"
+          echo "Checking for fvCFD.H..."
+          find "$WM_PROJECT_DIR/src" \
+            -name fvCFD.H -print
+          echo "Checking finiteVolume directory..."
+          ls -la "$WM_PROJECT_DIR/src/finiteVolume" | head -40
+          echo "Checking lnInclude directory..."
+          ls -la "$WM_PROJECT_DIR/src/finiteVolume/lnInclude" | head -40
+
       - name: Compile jovianShallowWater
         working-directory: openfoam/solvers/jovianShallowWater
         run: wmake
