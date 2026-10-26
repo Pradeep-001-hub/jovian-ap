@@ -42,14 +42,18 @@ def test_zonal_jet_connects_to_observation_generator():
     assert result["values"]["v"].shape == (3,)
     assert result["values"]["h"].shape == (3,)
 
+    # The jet depends on y, not x.
+    # At y = 0, u = 100.
+    # At y = 1, u = 100 * exp(-1).
     np.testing.assert_allclose(
         result["values"]["u"],
-        [100.0, 100.0 * np.exp(-1.0), 100.0 * np.exp(-1.0)],
+        [100.0, 100.0, 100.0 * np.exp(-1.0)],
     )
 
     np.testing.assert_allclose(
         result["values"]["v"],
         [0.0, 0.0, 0.0],
+        atol=1e-12,
     )
 
     assert result["seed"] == 42
@@ -89,12 +93,18 @@ def test_gaussian_vortex_connects_to_observation_generator():
     )
 
     assert set(result["values"]) == {"u", "v", "h"}
+    assert result["values"]["u"].shape == (3,)
+    assert result["values"]["v"].shape == (3,)
+    assert result["values"]["h"].shape == (3,)
 
+    # u = -V0 * (y - yc) / radius * exp(-r^2 / (2 radius^2))
     np.testing.assert_allclose(
         result["values"]["u"],
-        [100.0, 100.0, 100.0 * np.exp(-1.0)],
+        [0.0, 0.0, -50.0 * np.exp(-0.5)],
+        atol=1e-12,
     )
 
+    # v = V0 * (x - xc) / radius * exp(-r^2 / (2 radius^2))
     np.testing.assert_allclose(
         result["values"]["v"],
         [0.0, 50.0 * np.exp(-0.5), 0.0],
@@ -123,7 +133,11 @@ def test_observations_are_reproducible_for_same_seed():
             "h": flow["h"],
         },
         "observation_locations": locations,
-        "noise_std": {"u": 1.0, "v": 1.0, "h": 0.1},
+        "noise_std": {
+            "u": 1.0,
+            "v": 1.0,
+            "h": 0.1,
+        },
         "seed": 123,
     }
 
