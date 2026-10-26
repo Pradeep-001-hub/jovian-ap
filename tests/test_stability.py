@@ -58,8 +58,7 @@ def test_characteristic_speeds_for_resting_state():
     assert speed_y == pytest.approx(expected)
 
 
-def
-est_characteristic_speeds_include_fluid_velocity():
+def test_characteristic_speeds_include_fluid_velocity():
     state = np.zeros((2, 2, 3), dtype=float)
     state[..., 0] = 100.0
     state[..., 1] = 200.0
@@ -74,6 +73,8 @@ est_characteristic_speeds_include_fluid_velocity():
 
     assert speed_x == pytest.approx(2.0 + wave_speed)
     assert speed_y == pytest.approx(1.0 + wave_speed)
+
+
 @pytest.mark.parametrize(
     "state",
     [
