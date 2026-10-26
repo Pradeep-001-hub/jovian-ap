@@ -28,8 +28,12 @@ jobs:
         with:
           openfoam-version: 14
 
-      - name: Display OpenFOAM version
-        run: foamVersion
+      - name: Verify OpenFOAM environment
+        run: |
+          echo "OpenFOAM version: $WM_PROJECT_VERSION"
+          echo "OpenFOAM directory: $WM_PROJECT_DIR"
+          test "$WM_PROJECT_VERSION" = "14"
+          test -f "$WM_PROJECT_DIR/etc/bashrc"
 
       - name: Compile jovianShallowWater
         working-directory: openfoam/solvers/jovianShallowWater
