@@ -92,8 +92,8 @@ def test_gaussian_vortex_connects_to_observation_generator():
 
     np.testing.assert_allclose(
         result["values"]["u"],
-        [0.0, 0.0, -50.0 * np.exp(-0.5)],
-        atol=1e-12,
+        [100.0, 100.0, 100.0 * np.exp(-1.0)],
+    )
     )
 
     np.testing.assert_allclose(
